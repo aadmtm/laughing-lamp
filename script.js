@@ -1,5 +1,5 @@
-const TOTAL_QUESTIONS = 20;
-const TIME_PER_QUESTION = 10;
+const TOTAL_QUESTIONS = 10;
+const TIME_PER_QUESTION = 20;
 const SCORE_PER_CORRECT = 5;
 
 let currentQuestion = 0;
@@ -196,11 +196,11 @@ function createQuestion() {
 
   } else {
 
-    number1 = randomNumber(2, 20);
-    number2 = randomNumber(2, 10);
+    number1 = randomNumber(2, 10);
+    number2 = randomNumber(3, 10);
 
     const operators =
-      ["+", "-", "×"];
+      ["+", "-"];
 
     operator =
       operators[
