@@ -179,38 +179,28 @@ function createQuestion() {
   let number2;
   let operator;
 
-  if (level === 1) {
-
-    number1 = randomNumber(1, 10);
-    number2 = randomNumber(1, 10);
-
-    const operators = ["+", "-"];
-
-    operator =
-      operators[
-        randomNumber(
-          0,
-          operators.length - 1
-        )
-      ];
-
-  } else {
-
-    number1 = randomNumber(2, 10);
-    number2 = randomNumber(3, 10);
-
-    const operators =
-      ["+", "-"];
-
-    operator =
-      operators[
-        randomNumber(
-          0,
-          operators.length - 1
-        )
-      ];
-
+  const questions = [
+  {
+    question: "5 + 3 = ?",
+    answer: 8,
+    choices: [6, 7, 8, 9]
+  },
+  {
+    question: "10 - 4 = ?",
+    answer: 6,
+    choices: [4, 5, 6, 7]
+  },
+  {
+    question: "7 + 8 = ?",
+    answer: 15,
+    choices: [13, 14, 15, 16]
+  },
+  {
+    question: "15 - 6 = ?",
+    answer: 9,
+    choices: [7, 8, 9, 10]
   }
+];
 
 
   /* hindari hasil negatif */
