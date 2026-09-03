@@ -1,100 +1,161 @@
-const TOTAL_QUESTIONS = 10;
-const TIME_PER_QUESTION = 20;
-const SCORE_PER_CORRECT = 5;
+// =========================================
+// DATA SOAL
+// =========================================
+
+const questions = [
+  {
+    question: "2 + 1 = ?",
+    answer: 3,
+    choices: [5, 2, 3, 4]
+  },
+
+  {
+    question: "3 + 2 = ?",
+    answer: 5,
+    choices: [6, 5, 3, 4]
+  },
+
+  {
+    question: "3 + 3 = ?",
+    answer: 6,
+    choices: [6, 5, 3, 4]
+  },
+
+  {
+    question: "5 + 2 = ?",
+    answer: 7,
+    choices: [6, 5, 7, 4]
+  },
+
+  {
+    question: "2 + 4 = ?",
+    answer: 6,
+    choices: [6, 5, 1, 4]
+  }
+];
+
+
+// =========================================
+// VARIABLE GAME
+// =========================================
 
 let currentQuestion = 0;
 let score = 0;
-let correctCount = 0;
-let wrongCount = 0;
 
-let correctAnswer = 0;
-let timer = TIME_PER_QUESTION;
-let timerInterval = null;
+let timeLeft = 10;
 
-const homeScreen = document.getElementById("homeScreen");
-const gameScreen = document.getElementById("gameScreen");
-const resultScreen = document.getElementById("resultScreen");
+let timerInterval;
 
-const startButton = document.getElementById("startButton");
-const restartButton = document.getElementById("restartButton");
-
-const homeButton = document.getElementById("homeButton");
-const backHomeButton = document.getElementById("backHomeButton");
-
-const questionText = document.getElementById("questionText");
-const answerContainer = document.getElementById("answerContainer");
-
-const questionNumber = document.getElementById("questionNumber");
-const levelText = document.getElementById("levelText");
-const scoreText = document.getElementById("scoreText");
-
-const timerText = document.getElementById("timerText");
-const progressBar = document.getElementById("progressBar");
-
-const feedback = document.getElementById("feedback");
-
-const finalScore = document.getElementById("finalScore");
-const correctTotal = document.getElementById("correctTotal");
-const wrongTotal = document.getElementById("wrongTotal");
-
-const resultMessage = document.getElementById("resultMessage");
-
-const bestScoreHome =
-  document.getElementById("bestScoreHome");
+let answered = false;
 
 
-/* ========================
-   LOCAL STORAGE
-======================== */
+// =========================================
+// ELEMENT
+// =========================================
 
-function getBestScore() {
+const startScreen =
+  document.getElementById("startScreen");
 
-  return Number(
-    localStorage.getItem("mathBestScore")
+const gameScreen =
+  document.getElementById("gameScreen");
+
+const resultScreen =
+  document.getElementById("resultScreen");
+
+
+const startBtn =
+  document.getElementById("startBtn");
+
+const restartBtn =
+  document.getElementById("restartBtn");
+
+const backBtn =
+  document.getElementById("backBtn");
+
+const homeBtn =
+  document.getElementById("homeBtn");
+
+
+const questionElement =
+  document.getElementById("question");
+
+const choicesElement =
+  document.getElementById("choices");
+
+const questionNumber =
+  document.getElementById("questionNumber");
+
+const scoreElement =
+  document.getElementById("score");
+
+const currentScoreElement =
+  document.getElementById("currentScore");
+
+const timerElement =
+  document.getElementById("timer");
+
+const progressFill =
+  document.getElementById("progressFill");
+
+const feedback =
+  document.getElementById("feedback");
+
+const finalScore =
+  document.getElementById("finalScore");
+
+const bestScoreElement =
+  document.getElementById("bestScore");
+
+const resultMessage =
+  document.getElementById("resultMessage");
+
+const resultStars =
+  document.getElementById("resultStars");
+
+
+// =========================================
+// BEST SCORE
+// =========================================
+
+let bestScore =
+  Number(
+    localStorage.getItem(
+      "mathBestScore"
+    )
   ) || 0;
 
-}
 
-function updateBestScore() {
-
-  const bestScore = getBestScore();
-
-  if (score > bestScore) {
-
-    localStorage.setItem(
-      "mathBestScore",
-      score
-    );
-
-  }
-
-  bestScoreHome.textContent =
-    getBestScore();
-
-}
-
-bestScoreHome.textContent =
-  getBestScore();
+bestScoreElement.textContent =
+  bestScore;
 
 
-/* ========================
-   SCREEN
-======================== */
+// =========================================
+// PINDAH SCREEN
+// =========================================
 
 function showScreen(screen) {
 
-  homeScreen.classList.remove("active");
-  gameScreen.classList.remove("active");
-  resultScreen.classList.remove("active");
+  document
+    .querySelectorAll(".screen")
+    .forEach(item => {
 
-  screen.classList.add("active");
+      item.classList.remove(
+        "active"
+      );
+
+    });
+
+
+  screen.classList.add(
+    "active"
+  );
 
 }
 
 
-/* ========================
-   START GAME
-======================== */
+// =========================================
+// MULAI GAME
+// =========================================
 
 function startGame() {
 
@@ -102,346 +163,146 @@ function startGame() {
 
   score = 0;
 
-  correctCount = 0;
+  timeLeft = 10;
 
-  wrongCount = 0;
+  answered = false;
+
+
+  scoreElement.textContent =
+    score;
+
+  currentScoreElement.textContent =
+    score;
+
 
   showScreen(gameScreen);
 
-  createQuestion();
+  loadQuestion();
 
 }
 
 
-/* ========================
-   LEVEL
-======================== */
+// =========================================
+// LOAD QUESTION
+// =========================================
 
-function getCurrentLevel() {
+function loadQuestion() {
 
-  if (currentQuestion < 10) {
-    return 1;
-  }
-
-  return 2;
-
-}
-
-
-/* ========================
-   RANDOM
-======================== */
-
-function randomNumber(min, max) {
-
-  return Math.floor(
-    Math.random() * (max - min + 1)
-  ) + min;
-
-}
-
-
-/* ========================
-   CREATE QUESTION
-======================== */
-
-function createQuestion() {
+  answered = false;
 
   clearInterval(timerInterval);
 
+
   feedback.textContent = "";
-  feedback.className = "feedback";
 
-  currentQuestion++;
+  feedback.className =
+    "feedback";
 
-  if (currentQuestion > TOTAL_QUESTIONS) {
 
-    finishGame();
-    return;
+  const question =
+    questions[currentQuestion];
 
-  }
 
-  const level = getCurrentLevel();
+  questionElement.textContent =
+    question.question;
+
 
   questionNumber.textContent =
-    currentQuestion;
-
-  levelText.textContent =
-    level;
-
-  scoreText.textContent =
-    score;
-
-  progressBar.style.width =
-    `${(currentQuestion / TOTAL_QUESTIONS) * 100}%`;
-
-  let number1;
-  let number2;
-  let operator;
-
-  const questions = [
-  {
-    question: "5 + 3 = ?",
-    answer: 8,
-    choices: [6, 7, 8, 9]
-  },
-  {
-    question: "10 - 4 = ?",
-    answer: 6,
-    choices: [4, 5, 6, 7]
-  },
-  {
-    question: "7 + 8 = ?",
-    answer: 15,
-    choices: [13, 14, 15, 16]
-  },
-  {
-    question: "15 - 6 = ?",
-    answer: 9,
-    choices: [7, 8, 9, 10]
-  }
-];
+    currentQuestion + 1;
 
 
-  /* hindari hasil negatif */
-
-  if (
-    operator === "-" &&
-    number2 > number1
-  ) {
-
-    [number1, number2] =
-      [number2, number1];
-
-  }
+  progressFill.style.width =
+    `${
+      ((currentQuestion + 1)
+      / questions.length)
+      * 100
+    }%`;
 
 
-  if (operator === "+") {
-
-    correctAnswer =
-      number1 + number2;
-
-  }
-
-  if (operator === "-") {
-
-    correctAnswer =
-      number1 - number2;
-
-  }
-
-  if (operator === "×") {
-
-    correctAnswer =
-      number1 * number2;
-
-  }
+  choicesElement.innerHTML = "";
 
 
-  questionText.textContent =
-    `${number1} ${operator} ${number2} = ?`;
+  question.choices.forEach(choice => {
 
-  createAnswers();
+    const button =
+      document.createElement(
+        "button"
+      );
+
+    button.className =
+      "choice-btn";
+
+    button.textContent =
+      choice;
+
+
+    button.addEventListener(
+      "click",
+      () => selectAnswer(
+        choice,
+        button
+      )
+    );
+
+
+    choicesElement.appendChild(
+      button
+    );
+
+  });
+
 
   startTimer();
 
 }
 
 
-/* ========================
-   ANSWERS
-======================== */
-
-function createAnswers() {
-
-  answerContainer.innerHTML = "";
-
-  let answers = [correctAnswer];
-
-  while (answers.length < 4) {
-
-    const offset =
-      randomNumber(-8, 8);
-
-    const wrong =
-      correctAnswer + offset;
-
-    if (
-      wrong >= 0 &&
-      !answers.includes(wrong)
-    ) {
-
-      answers.push(wrong);
-
-    }
-
-  }
-
-  answers =
-    answers.sort(
-      () => Math.random() - 0.5
-    );
-
-  answers.forEach(answer => {
-
-    const button =
-      document.createElement("button");
-
-    button.className =
-      "answer-button";
-
-    button.textContent =
-      answer;
-
-    button.addEventListener(
-      "click",
-      () => checkAnswer(
-        answer,
-        button
-      )
-    );
-
-    answerContainer.appendChild(
-      button
-    );
-
-  });
-
-}
-
-
-/* ========================
-   CHECK ANSWER
-======================== */
-
-function checkAnswer(
-  selectedAnswer,
-  selectedButton
-) {
-
-  clearInterval(timerInterval);
-
-  disableAnswers();
-
-  if (
-    selectedAnswer ===
-    correctAnswer
-  ) {
-
-    score += SCORE_PER_CORRECT;
-
-    correctCount++;
-
-    selectedButton.classList.add(
-      "correct"
-    );
-
-    feedback.textContent =
-      "Hebat! Jawaban benar 🎉";
-
-    feedback.classList.add(
-      "correct"
-    );
-
-  } else {
-
-    wrongCount++;
-
-    selectedButton.classList.add(
-      "wrong"
-    );
-
-    feedback.textContent =
-      `Belum tepat. Jawabannya ${correctAnswer}`;
-
-    feedback.classList.add(
-      "wrong"
-    );
-
-    showCorrectAnswer();
-
-  }
-
-  scoreText.textContent =
-    score;
-
-  setTimeout(
-    createQuestion,
-    1100
-  );
-
-}
-
-
-/* ========================
-   DISABLE ANSWERS
-======================== */
-
-function disableAnswers() {
-
-  const buttons =
-    document.querySelectorAll(
-      ".answer-button"
-    );
-
-  buttons.forEach(button => {
-
-    button.disabled = true;
-
-  });
-
-}
-
-
-/* ========================
-   SHOW CORRECT ANSWER
-======================== */
-
-function showCorrectAnswer() {
-
-  const buttons =
-    document.querySelectorAll(
-      ".answer-button"
-    );
-
-  buttons.forEach(button => {
-
-    if (
-      Number(button.textContent) ===
-      correctAnswer
-    ) {
-
-      button.classList.add(
-        "correct"
-      );
-
-    }
-
-  });
-
-}
-
-
-/* ========================
-   TIMER
-======================== */
+// =========================================
+// TIMER
+// =========================================
 
 function startTimer() {
 
-  timer = TIME_PER_QUESTION;
+  timeLeft = 10;
 
-  timerText.textContent =
-    timer;
+  timerElement.textContent =
+    timeLeft;
+
+
+  const timerCircle =
+    document.querySelector(
+      ".timer-circle"
+    );
+
+
+  timerCircle.classList.remove(
+    "warning"
+  );
+
 
   timerInterval =
     setInterval(() => {
 
-      timer--;
+      timeLeft--;
 
-      timerText.textContent =
-        timer;
+      timerElement.textContent =
+        timeLeft;
 
-      if (timer <= 0) {
+
+      // warning ketika tersisa 3 detik
+
+      if (timeLeft <= 3) {
+
+        timerCircle.classList.add(
+          "warning"
+        );
+
+      }
+
+
+      // waktu habis
+
+      if (timeLeft <= 0) {
 
         clearInterval(
           timerInterval
@@ -456,112 +317,350 @@ function startTimer() {
 }
 
 
-/* ========================
-   TIME OUT
-======================== */
+// =========================================
+// PILIH JAWABAN
+// =========================================
+
+function selectAnswer(
+  selectedAnswer,
+  selectedButton
+) {
+
+  if (answered) return;
+
+
+  answered = true;
+
+  clearInterval(
+    timerInterval
+  );
+
+
+  const correctAnswer =
+    questions[currentQuestion]
+      .answer;
+
+
+  const buttons =
+    document.querySelectorAll(
+      ".choice-btn"
+    );
+
+
+  buttons.forEach(button => {
+
+    button.disabled = true;
+
+  });
+
+
+  // BENAR
+
+  if (
+    selectedAnswer ===
+    correctAnswer
+  ) {
+
+    score += 5;
+
+
+    selectedButton.classList.add(
+      "correct"
+    );
+
+
+    feedback.textContent =
+      "🎉 Benar! +5 poin";
+
+    feedback.classList.add(
+      "correct"
+    );
+
+  }
+
+  // SALAH
+
+  else {
+
+    selectedButton.classList.add(
+      "wrong"
+    );
+
+
+    feedback.textContent =
+      `😅 Belum tepat! Jawabannya ${correctAnswer}`;
+
+    feedback.classList.add(
+      "wrong"
+    );
+
+
+    // tampilkan jawaban benar
+
+    buttons.forEach(button => {
+
+      if (
+        Number(button.textContent)
+        === correctAnswer
+      ) {
+
+        button.classList.add(
+          "correct"
+        );
+
+      }
+
+    });
+
+  }
+
+
+  updateScore();
+
+
+  // lanjut soal berikutnya
+
+  setTimeout(() => {
+
+    nextQuestion();
+
+  }, 1300);
+
+}
+
+
+// =========================================
+// WAKTU HABIS
+// =========================================
 
 function timeOut() {
 
-  wrongCount++;
+  if (answered) return;
 
-  disableAnswers();
+  answered = true;
 
-  showCorrectAnswer();
+
+  const correctAnswer =
+    questions[currentQuestion]
+      .answer;
+
+
+  const buttons =
+    document.querySelectorAll(
+      ".choice-btn"
+    );
+
+
+  buttons.forEach(button => {
+
+    button.disabled = true;
+
+
+    if (
+      Number(button.textContent)
+      === correctAnswer
+    ) {
+
+      button.classList.add(
+        "correct"
+      );
+
+    }
+
+  });
+
 
   feedback.textContent =
-    `Waktu habis! Jawabannya ${correctAnswer}`;
+    `⏰ Waktu habis! Jawabannya ${correctAnswer}`;
 
-  feedback.className =
-    "feedback wrong";
+  feedback.classList.add(
+    "wrong"
+  );
 
-  setTimeout(
-    createQuestion,
-    1200
+
+  setTimeout(() => {
+
+    nextQuestion();
+
+  }, 1500);
+
+}
+
+
+// =========================================
+// UPDATE SCORE
+// =========================================
+
+function updateScore() {
+
+  scoreElement.textContent =
+    score;
+
+  currentScoreElement.textContent =
+    score;
+
+}
+
+
+// =========================================
+// NEXT QUESTION
+// =========================================
+
+function nextQuestion() {
+
+  currentQuestion++;
+
+
+  if (
+    currentQuestion <
+    questions.length
+  ) {
+
+    loadQuestion();
+
+  }
+
+  else {
+
+    endGame();
+
+  }
+
+}
+
+
+// =========================================
+// SELESAI GAME
+// =========================================
+
+function endGame() {
+
+  clearInterval(
+    timerInterval
+  );
+
+
+  finalScore.textContent =
+    score;
+
+
+  // simpan skor terbaik
+
+  if (score > bestScore) {
+
+    bestScore = score;
+
+    localStorage.setItem(
+      "mathBestScore",
+      bestScore
+    );
+
+  }
+
+
+  bestScoreElement.textContent =
+    bestScore;
+
+
+  // Pesan hasil
+
+  if (score === 25) {
+
+    resultMessage.textContent =
+      "Luar biasa! Semua jawaban benar! 🎉";
+
+    resultStars.textContent =
+      "⭐⭐⭐⭐⭐";
+
+  }
+
+  else if (score >= 20) {
+
+    resultMessage.textContent =
+      "Hebat sekali! Sedikit lagi sempurna!";
+
+    resultStars.textContent =
+      "⭐⭐⭐⭐";
+
+  }
+
+  else if (score >= 15) {
+
+    resultMessage.textContent =
+      "Bagus! Terus berlatih ya!";
+
+    resultStars.textContent =
+      "⭐⭐⭐";
+
+  }
+
+  else if (score >= 10) {
+
+    resultMessage.textContent =
+      "Semangat! Kamu pasti bisa!";
+
+    resultStars.textContent =
+      "⭐⭐";
+
+  }
+
+  else {
+
+    resultMessage.textContent =
+      "Ayo coba lagi dan raih skor terbaik!";
+
+    resultStars.textContent =
+      "⭐";
+
+  }
+
+
+  showScreen(
+    resultScreen
   );
 
 }
 
 
-/* ========================
-   RESULT
-======================== */
+// =========================================
+// BUTTON EVENT
+// =========================================
 
-function finishGame() {
-
-  clearInterval(timerInterval);
-
-  updateBestScore();
-
-  finalScore.textContent =
-    score;
-
-  correctTotal.textContent =
-    correctCount;
-
-  wrongTotal.textContent =
-    wrongCount;
-
-  if (score >= 90) {
-
-    resultMessage.textContent =
-      "Luar biasa! Kamu jago matematika! 🌟";
-
-  } else if (score >= 70) {
-
-    resultMessage.textContent =
-      "Hebat! Terus pertahankan! 🎉";
-
-  } else if (score >= 50) {
-
-    resultMessage.textContent =
-      "Bagus! Yuk latihan lagi! 💪";
-
-  } else {
-
-    resultMessage.textContent =
-      "Tetap semangat belajar! 📚";
-
-  }
-
-  showScreen(resultScreen);
-
-}
-
-
-/* ========================
-   BUTTON EVENTS
-======================== */
-
-startButton.addEventListener(
+startBtn.addEventListener(
   "click",
   startGame
 );
 
-restartButton.addEventListener(
+
+restartBtn.addEventListener(
   "click",
   startGame
 );
 
-homeButton.addEventListener(
+
+backBtn.addEventListener(
   "click",
   () => {
 
-    clearInterval(timerInterval);
-
-    showScreen(homeScreen);
-
-    updateBestScore();
+    showScreen(
+      startScreen
+    );
 
   }
 );
 
-backHomeButton.addEventListener(
+
+homeBtn.addEventListener(
   "click",
   () => {
 
-    showScreen(homeScreen);
+    clearInterval(
+      timerInterval
+    );
 
-    updateBestScore();
+    showScreen(
+      startScreen
+    );
 
   }
 );
